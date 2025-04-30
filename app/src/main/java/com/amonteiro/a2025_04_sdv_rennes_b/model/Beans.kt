@@ -34,6 +34,9 @@ fun main() {
 //    ThermometerBean.getCelsiusThermometer()
 
     val randomName = RandomName()
+    val randomName2 = RandomName()
+
+
     randomName.add("bobby")
     randomName.addAll("bobby", "Tobby", "Gustavo")
     repeat(10) {
