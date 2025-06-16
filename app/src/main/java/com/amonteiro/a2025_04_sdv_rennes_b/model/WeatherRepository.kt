@@ -3,7 +3,6 @@ package com.amonteiro.a2025_04_sdv_rennes_b.model
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import kotlin.jvm.java
 
 
 //Utilisation
@@ -15,24 +14,34 @@ fun main() {
 //
 //    WeatherRepository.loadWeathers("Nice")
 
-    val user = WeatherRepository.loadRandomUser()
+//    val user = WeatherRepository.loadRandomUser()
+//
+//    println("""
+//        Il s'appelle ${user.name} pour le contacter :
+//        Phone : ${user.coord?.phone ?: "-"}
+//        Mail : ${user.coord?.mail ?: "-"}
+//    """.trimIndent())
+//
+//
+//    for(u in WeatherRepository.loadRandomUsers()) {
+//
+//        println(
+//            """
+//        Il s'appelle ${u.name} pour le contacter :
+//        Phone : ${u.coord?.phone ?: "-"}
+//        Mail : ${u.coord?.mail ?: "-"}
+//
+//    """.trimIndent()
+//        )
+//    }
 
-    println("""
-        Il s'appelle ${user.name} pour le contacter :
-        Phone : ${user.coord?.phone ?: "-"}
-        Mail : ${user.coord?.mail ?: "-"}
-    """.trimIndent())
-
-
-    for(u in WeatherRepository.loadRandomUsers()) {
-
+    for (weather in WeatherRepository.loadWeathers("nice")) {
         println(
             """
-        Il s'appelle ${u.name} pour le contacter :
-        Phone : ${u.coord?.phone ?: "-"}
-        Mail : ${u.coord?.mail ?: "-"}
-        
-    """.trimIndent()
+            Il fait ${weather.main.temp}° à ${weather.name} (id=${weather.id}) avec un vent de ${weather.wind.speed} m/s
+            -Description : ${weather.weather.firstOrNull()?.description ?: "-"}
+            -Icône : ${weather.weather.firstOrNull()?.icon ?: "-"}
+        """.trimIndent()
         )
     }
 
@@ -44,12 +53,16 @@ object WeatherRepository {
     val client = OkHttpClient()
     val gson = Gson()
 
-    fun loadWeathers(cityname:String) {
-       val json =  sendGet("https://api.openweathermap.org/data/2.5/find?q=$cityname&cnt=5&appid=b80967f0a6bd10d23e44848547b26550&units=metric&lang=fr")
+    fun loadWeathers(cityname: String): List<WeatherBean> {
+        val json = sendGet("https://api.openweathermap.org/data/2.5/find?q=$cityname&cnt=5&appid=b80967f0a6bd10d23e44848547b26550&units=metric&lang=fr")
 
 
+        //Parser le JSON avec le bon bean et GSON
+        //Si c'est un Objet
+        val data = gson.fromJson(json, APIWeatherResult::class.java)
 
-        println(json)
+        //Retourner la donnée
+        return data.list
     }
 
     fun loadRandomUser(): UserBean {
@@ -58,7 +71,7 @@ object WeatherRepository {
 
         //Parser le JSON avec le bon bean et GSON
         //Si c'est un Objet
-        val data  = gson.fromJson(json, UserBean::class.java)
+        val data = gson.fromJson(json, UserBean::class.java)
 
         //Retourner la donnée
         return data
@@ -71,7 +84,7 @@ object WeatherRepository {
 
         //Parser le JSON avec le bon bean et GSON
         //Si c'est un Objet
-        val data  = gson.fromJson(json, Array<UserBean>::class.java)
+        val data = gson.fromJson(json, Array<UserBean>::class.java)
 
         //Retourner la donnée
         return data
@@ -101,5 +114,14 @@ object WeatherRepository {
 // USER
 /* -------------------------------- */
 
-data class UserBean(var name: String, var age:Int, var coord:CoordBean? )
-data class CoordBean(var phone: String?, var mail:String?)
+data class UserBean(var name: String, var age: Int, var coord: CoordBean?)
+data class CoordBean(var phone: String?, var mail: String?)
+
+/* -------------------------------- */
+// Weather
+/* -------------------------------- */
+data class APIWeatherResult(var list: List<WeatherBean>)
+data class WeatherBean(var id: String, var name: String, var wind: Wind, var main: Main, var weather: List<Weather>)
+data class Main(var temp: Double)
+data class Weather(var description: String, var icon: String)
+data class Wind(var speed: Double)
