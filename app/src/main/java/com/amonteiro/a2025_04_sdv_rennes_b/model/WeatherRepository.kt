@@ -56,10 +56,17 @@ object WeatherRepository {
     fun loadWeathers(cityname: String): List<WeatherBean> {
         val json = sendGet("https://api.openweathermap.org/data/2.5/find?q=$cityname&cnt=5&appid=b80967f0a6bd10d23e44848547b26550&units=metric&lang=fr")
 
+        Thread.sleep(5000)
 
         //Parser le JSON avec le bon bean et GSON
         //Si c'est un Objet
         val data = gson.fromJson(json, APIWeatherResult::class.java)
+
+        data.list.forEach { weather->
+            weather.weather.forEach {
+                it.icon = "https://openweathermap.org/img/wn/${it.icon}@4x.png"
+            }
+        }
 
         //Retourner la donnée
         return data.list
@@ -121,7 +128,7 @@ data class CoordBean(var phone: String?, var mail: String?)
 // Weather
 /* -------------------------------- */
 data class APIWeatherResult(var list: List<WeatherBean>)
-data class WeatherBean(var id: String, var name: String, var wind: Wind, var main: Main, var weather: List<Weather>)
+data class WeatherBean(var id: Int, var name: String, var wind: Wind, var main: Main, var weather: List<Weather>)
 data class Main(var temp: Double)
 data class Weather(var description: String, var icon: String)
 data class Wind(var speed: Double)
