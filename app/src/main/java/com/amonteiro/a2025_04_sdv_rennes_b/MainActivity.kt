@@ -16,13 +16,15 @@ import com.amonteiro.a2025_04_sdv_rennes_b.ui.theme._2025_04_sdv_rennes_bTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             _2025_04_sdv_rennes_bTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        name = "Android",
+                        name = "from onCreate",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -41,10 +43,19 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     )
 }
 
-@Preview(showBackground = true)
+
+//showSystemUi Affiche le reste de l'écran
+@Preview(
+    showBackground = true,
+    widthDp = 320,
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES or android.content.res.Configuration.UI_MODE_TYPE_NORMAL,
+    name = "Dark",
+    showSystemUi = true
+)
+@Preview(showBackground = true, widthDp = 320)
 @Composable
-fun GreetingPreview() {
+fun DefaultPreview() {
     _2025_04_sdv_rennes_bTheme {
-        Greeting("Android")
+        Greeting("Bobby")
     }
 }

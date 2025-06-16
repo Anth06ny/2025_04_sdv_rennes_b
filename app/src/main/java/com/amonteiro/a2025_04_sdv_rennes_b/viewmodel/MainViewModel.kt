@@ -17,31 +17,45 @@ fun main() {
     }
     //Affichage de la liste (qui doit être remplie) contenue dans la donnée observable
     println("List : ${viewModel.dataList.value}")
+    println("ErrorMessage : ${viewModel.errorMessage.value}" )
 }
 
 class MainViewModel : ViewModel() {
     //MutableStateFlow est une donnée observable
     val dataList = MutableStateFlow(emptyList<PictureBean>())
     val runInProgress = MutableStateFlow(false)
+    val errorMessage = MutableStateFlow("")
 
     fun loadWeathers(cityName: String) {
 
         runInProgress.value = true
+        errorMessage.value = ""
+
         viewModelScope.launch(Dispatchers.IO) {
-            val list = WeatherRepository.loadWeathers(cityName)
-            dataList.value = list.map { weather ->
-                PictureBean(
-                    id = weather.id,
-                    url = weather.weather.firstOrNull()?.icon ?: "",
-                    title = weather.name,
-                    longText = """
+
+            try {
+
+                val list = WeatherRepository.loadWeathers(cityName)
+                dataList.value = list.map { weather ->
+                    PictureBean(
+                        id = weather.id,
+                        url = weather.weather.firstOrNull()?.icon ?: "",
+                        title = weather.name,
+                        longText = """
             Il fait ${weather.main.temp}° à ${weather.name} (id=${weather.id}) avec un vent de ${weather.wind.speed} m/s
             -Description : ${weather.weather.firstOrNull()?.description ?: "-"}
             -Icône : ${weather.weather.firstOrNull()?.icon ?: "-"}
         """.trimIndent()
-                )
+                    )
+                }
             }
-            runInProgress.value = false
+            catch(e:Exception) {
+                e.printStackTrace()
+                errorMessage.value = e.message ?: "Une erreur est survenue"
+            }
+            finally {
+                runInProgress.value = false
+            }
         }
 
     }
