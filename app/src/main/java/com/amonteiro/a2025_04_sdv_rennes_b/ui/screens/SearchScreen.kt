@@ -12,7 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.amonteiro.a2025_04_sdv_rennes_b.ui.theme._2025_04_sdv_rennes_bTheme
+import com.amonteiro.a2025_04_sdv_rennes_b.viewmodel.MainViewModel
 
 @Preview(showBackground = true, showSystemUi = true)
 @Preview(showBackground = true, showSystemUi = true,
@@ -23,21 +25,25 @@ fun SearchScreenPreview() {
     //Utilisé par exemple dans MainActivity.kt sous setContent {...}
     _2025_04_sdv_rennes_bTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+
+
             SearchScreen(modifier = Modifier.padding(innerPadding))
         }
     }
 }
 
 @Composable
-fun SearchScreen(modifier: Modifier = Modifier) {
+fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = MainViewModel()) {
     Column (modifier= modifier) {
         println("SearchScreen()")
         Text(text = "Text1",fontSize = 20.sp)
         Spacer(Modifier.size(8.dp))
         Text(text = "Text2",fontSize = 14.sp)
 
-        repeat(10) {
-            PictureRowItem("Coucou$it")
+        val list = mainViewModel.dataList.collectAsStateWithLifecycle().value
+
+        repeat(list.size) {
+            PictureRowItem(list[it].title)
         }
     }
 }
