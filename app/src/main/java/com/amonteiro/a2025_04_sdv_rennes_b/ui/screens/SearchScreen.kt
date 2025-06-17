@@ -1,6 +1,8 @@
 package com.amonteiro.a2025_04_sdv_rennes_b.ui.screens
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +25,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -58,9 +63,12 @@ fun SearchScreenPreview() {
 fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = MainViewModel()) {
     Column(modifier = modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
 
-        SearchBar()
+        var searchText = remember { mutableStateOf("") }
+
+        SearchBar(searchText= searchText)
 
         val list = mainViewModel.dataList.collectAsStateWithLifecycle().value
+            .filter { it.title.contains(searchText.value) }
 
         //Permet de remplacer très facilement le RecyclerView. LazyRow existe aussi
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.weight(1f)) {
@@ -71,7 +79,7 @@ fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = M
 
         Row {
             Button(
-                onClick = { /* Do something! */ },
+                onClick = { searchText.value = ""},
                 contentPadding = ButtonDefaults.ButtonWithIconContentPadding
             ) {
                 Icon(
@@ -103,10 +111,14 @@ fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = M
 }
 
 @Composable
-fun SearchBar(modifier: Modifier = Modifier) {
+fun SearchBar(modifier: Modifier = Modifier,  searchText: MutableState<String>) {
+
+
+
+
     TextField(
-        value = "", //Valeur affichée
-        onValueChange = {newValue:String -> }, //Nouveau texte entrée
+        value = searchText.value, //Valeur affichée
+        onValueChange = {newValue:String -> searchText.value = newValue }, //Nouveau texte entrée
         leadingIcon = { //Image d'icone
             Icon(
                 imageVector = Icons.Default.Search,
@@ -136,6 +148,9 @@ fun SearchBar(modifier: Modifier = Modifier) {
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable //Composable affichant 1 PictureBean
 fun PictureRowItem(modifier: Modifier = Modifier, data: PictureBean) {
+
+    var expended = remember { mutableStateOf(false) }
+
     Row(modifier = modifier
         .background(MaterialTheme.colorScheme.tertiaryContainer)
         .fillMaxWidth()) {
@@ -158,11 +173,19 @@ fun PictureRowItem(modifier: Modifier = Modifier, data: PictureBean) {
                 .widthIn(max = 100.dp)
         )
 
-        Column(modifier = Modifier.padding(4.dp)) {
+        Column(modifier = Modifier.padding(4.dp).clickable{
+            expended.value = !expended.value
+        }) {
             Text(text = data.title, color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.bodyLarge)
-            Text(text = data.longText.take(20) + "...", style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onTertiaryContainer)
+
+            var finaltext = if(expended.value) data.longText else (data.longText.take(20) + "...")
+
+            Text(text = finaltext,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                modifier = Modifier.animateContentSize()
+                )
         }
     }
 }

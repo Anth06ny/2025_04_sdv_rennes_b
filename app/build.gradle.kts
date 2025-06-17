@@ -42,7 +42,11 @@ dependencies {
     implementation(libs.okhttp)
     implementation("com.google.code.gson:gson:+")
 
+    //image
     implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
+
+    //pour le =viewModel
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

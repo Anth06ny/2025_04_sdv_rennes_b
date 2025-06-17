@@ -27,6 +27,7 @@ class MainViewModel : ViewModel() {
     val errorMessage = MutableStateFlow("")
 
     init {
+        println("init viewmodel")
         loadFakeData()
     }
 
