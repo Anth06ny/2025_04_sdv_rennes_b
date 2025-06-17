@@ -26,10 +26,10 @@ class MainViewModel : ViewModel() {
     val runInProgress = MutableStateFlow(false)
     val errorMessage = MutableStateFlow("")
 
-    init {
-        println("init viewmodel")
-        loadFakeData()
-    }
+//    init {
+//        println("init viewmodel")
+//        loadFakeData()
+//    }
 
     fun loadWeathers(cityName: String) {
 

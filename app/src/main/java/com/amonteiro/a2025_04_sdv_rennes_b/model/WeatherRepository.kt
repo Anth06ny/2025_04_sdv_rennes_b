@@ -56,8 +56,6 @@ object WeatherRepository {
     fun loadWeathers(cityname: String): List<WeatherBean> {
         val json = sendGet("https://api.openweathermap.org/data/2.5/find?q=$cityname&cnt=5&appid=b80967f0a6bd10d23e44848547b26550&units=metric&lang=fr")
 
-        Thread.sleep(3000)
-
         //Parser le JSON avec le bon bean et GSON
         //Si c'est un Objet
         val data = gson.fromJson(json, APIWeatherResult::class.java)

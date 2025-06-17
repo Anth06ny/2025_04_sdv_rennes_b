@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
@@ -28,13 +30,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.amonteiro.a2025_04_sdv_rennes_b.R
 import com.amonteiro.a2025_04_sdv_rennes_b.model.PictureBean
 import com.amonteiro.a2025_04_sdv_rennes_b.ui.theme._2025_04_sdv_rennes_bTheme
@@ -54,21 +59,29 @@ fun SearchScreenPreview() {
     //Utilisé par exemple dans MainActivity.kt sous setContent {...}
     _2025_04_sdv_rennes_bTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            SearchScreen(modifier = Modifier.padding(innerPadding))
+
+            val mainViewModel = MainViewModel()
+            mainViewModel.loadFakeData(true, "une erreur")
+
+            SearchScreen(modifier = Modifier.padding(innerPadding), mainViewModel)
         }
     }
 }
 
 @Composable
-fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = MainViewModel()) {
+fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = viewModel()) {
     Column(modifier = modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
 
-        var searchText = remember { mutableStateOf("") }
+        var searchText = rememberSaveable { mutableStateOf("") }
 
-        SearchBar(searchText= searchText)
+        SearchBar(searchText= searchText,
+            onSearchAction = {mainViewModel.loadWeathers(searchText.value)}
+
+        )
+
 
         val list = mainViewModel.dataList.collectAsStateWithLifecycle().value
-            .filter { it.title.contains(searchText.value) }
+            //.filter { it.title.contains(searchText.value, true) }
 
         //Permet de remplacer très facilement le RecyclerView. LazyRow existe aussi
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.weight(1f)) {
@@ -92,7 +105,7 @@ fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = M
             }
 
             Button(
-                onClick = { /* Do something! */ },
+                onClick = { mainViewModel.loadWeathers(searchText.value) },
                 contentPadding = ButtonDefaults.ButtonWithIconContentPadding
             ) {
                 Icon(
@@ -111,7 +124,7 @@ fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = M
 }
 
 @Composable
-fun SearchBar(modifier: Modifier = Modifier,  searchText: MutableState<String>) {
+fun SearchBar(modifier: Modifier = Modifier,  searchText: MutableState<String>, onSearchAction : ()->Unit) {
 
 
 
@@ -136,8 +149,10 @@ fun SearchBar(modifier: Modifier = Modifier,  searchText: MutableState<String>) 
         //Text("Recherche")
         //},
 
-        //keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), // Définir le bouton "Entrée" comme action de recherche
-        //keyboardActions = KeyboardActions(onSearch = {onSearchAction()}), // Déclenche l'action définie
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), // Définir le bouton "Entrée" comme action de recherche
+        keyboardActions = KeyboardActions(onSearch = {
+            onSearchAction()
+        }), // Déclenche l'action définie
         //Comment le composant doit se placer
         modifier = modifier
             .fillMaxWidth() // Prend toute la largeur
