@@ -1,5 +1,6 @@
 package com.amonteiro.a2025_04_sdv_rennes_b.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,8 +27,6 @@ fun SearchScreenPreview() {
     //Utilisé par exemple dans MainActivity.kt sous setContent {...}
     _2025_04_sdv_rennes_bTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
-
             SearchScreen(modifier = Modifier.padding(innerPadding))
         }
     }
@@ -34,9 +34,9 @@ fun SearchScreenPreview() {
 
 @Composable
 fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = MainViewModel()) {
-    Column (modifier= modifier) {
+    Column (modifier= modifier.background(Color.LightGray)) {
         println("SearchScreen()")
-        Text(text = "Text1",fontSize = 20.sp)
+        Text(text = "Text1",fontSize = 20.sp, modifier = Modifier.background(Color.Yellow))
         Spacer(Modifier.size(8.dp))
         Text(text = "Text2",fontSize = 14.sp)
 
