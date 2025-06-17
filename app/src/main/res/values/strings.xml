@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">2025_04_sdv_rennes_b</string>
+    <string name="bt_loaddata">Load data</string>
+    <string name="clear_filter">Clear filter</string>
 </resources>
